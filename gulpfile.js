@@ -1,7 +1,8 @@
 var gulp = require('gulp'), 
 	less = require('gulp-less') ,
 	notify = require("gulp-notify") ,
-	bower = require('gulp-bower');
+	bower = require('gulp-bower'),
+	webserver = require('gulp-webserver');
 
 
 var config = {
@@ -34,9 +35,19 @@ gulp.task('css', function() { 
 		.pipe(gulp.dest('./public/css')); 
 });
 
+gulp.task('webserver', function() {
+	gulp.src('./public')
+		.pipe(webserver({
+				host: 'localhost',
+				port: '5000',
+				livereload: true,
+				directoryListing: false
+		}));
+});
+
 // Rerun the task when a file changes
  gulp.task('watch', function() {
 	gulp.watch(config.sassPath + '/**/*.less', ['css']); 
 });
 
-  gulp.task('default', ['bower', 'icons', 'css']);
+gulp.task('default', ['bower', 'icons', 'css', 'webserver']);
