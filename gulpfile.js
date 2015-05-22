@@ -1,4 +1,5 @@
 var gulp = require('gulp'), 
+	jade = require('gulp-jade') ,
 	less = require('gulp-less') ,
 	notify = require("gulp-notify") ,
 	bower = require('gulp-bower'),
@@ -7,6 +8,7 @@ var gulp = require('gulp'), 
 
 
 var config = {
+	jadePath: './resources/jade',
 	lessPath: './resources/less',
 	bowerDir: './bower_components' 
 }
@@ -19,6 +21,14 @@ gulp.task('bower', function() { 
 gulp.task('icons', function() { 
 	return gulp.src(config.bowerDir + '/fontawesome/fonts/**.*') 
 		.pipe(gulp.dest('./public/fonts')); 
+});
+
+gulp.task('templates', function() {
+  gulp.src(config.jadePath+'/*.jade')
+    .pipe(jade({
+    	pretty: true
+    }))
+    .pipe(gulp.dest('./public'))
 });
 
 gulp.task('css', function() { 
@@ -52,4 +62,4 @@ gulp.task('webserver', function() {
 	gulp.watch(config.lessPath + '/*.less', ['css']); 
 });
 
-gulp.task('default', ['bower', 'icons', 'css', 'webserver', 'watch']);
+gulp.task('default', ['bower', 'icons', 'templates', 'css', 'webserver', 'watch']);
