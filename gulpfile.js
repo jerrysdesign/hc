@@ -1,78 +1,107 @@
 var gulp      = require('gulp'), 
 		jade      = require('gulp-jade') ,
 		less      = require('gulp-less') ,
-		notify    = require("gulp-notify") ,
+		notify    = require('gulp-notify') ,
 		bower     = require('gulp-bower'),
 		webserver = require('gulp-webserver'),
-		connect   = require('gulp-connect');
+		connect   = require('gulp-connect'),
+		connectphp = require('gulp-connect-php');
+
+var src = {};
+var hidden_files = '**/_*.*';
+var ignored_files = '!'+hidden_files;
 
 // Sources config
-var source = {
-	resource : './resources',
-	jadePath : './resources/jade',
-	lessPath : './resources/less',
-	bowerDir : './bower_components' 
-}
-
 var config = {
+	resource	:	'./resources',
+	jade			:	'./resources/jade',
+	less			:	'./resources/less',
+	vendor		:	'./bower_components' 
+}
+
+
+var source = {
 	templates: {
-		main: [source.jadePath + '/index.jade'],
-		file: [source.jadePath + '/**/*.jade'],
-		watch: [source.jadePath + '/**/*.jade']
+		main	: [config.jade + '/index.jade'],
+		file	: [config.jade + '/**/*.jade'],
+		watch	: [config.jade + '/**/*.jade']
 	},
-	styles: {
-		main: [source.lessPath + '/style.less'],
-		file: [source.lessPath + '/**/*.less'],
-		watch: [source.lessPath + '/**/*.less']
+	styles	: {
+		main	: [config.less + '/style.less'],
+		theme	: [config.less + '/theme.less'],
+		file	: [config.less + '/**/*.less'],
+		watch	: [config.less + '/**/*.less'],
+		dir		: [config.less]
 	},
-	dest: {
-		templates: './public',
-		styles: './public/css'
-	},
-	server: './public'
+	vendor	: {
+		font:
+		[
+			config.vendor + '/open-sans-fontface/open-sans.css',
+			config.vendor + '/open-sans-fontface/fonts/Light/*',
+			config.vendor + '/open-sans-fontface/fonts/Regular/*',
+			config.vendor + '/open-sans-fontface/fonts/Italic/*',
+			config.vendor + '/open-sans-fontface/fonts/Semibold/*',
+			config.vendor + '/fontawesome/css/font-awesome.min.css',
+			config.vendor + '/fontawesome/fonts/*'
+		],
+		iconfont : [config.vendor + '/fontawesome/fonts/**.*']
+	}
 }
 
+// Build target config 
 var buide = {
-	templates: config.templates.file,
-	styles: config.styles.file
+	vendor		: './vendor' ,
+	styles		: './css',
+	templates	: '..',
+	iconfont	: './fonts',
+	font			: './fonts',
+	derver		: '..'
 }
 
-gulp.task('bower', function() { 
-	return bower()
-		.pipe(gulp.dest(source.bowerDir)) 
-});
+
+//---------------
+// TASKS
+//---------------
 
 gulp.task('icons', function() { 
-	return gulp.src(source.bowerDir + '/fontawesome/fonts/**.*') 
-		.pipe(gulp.dest('./public/fonts')); 
+	return gulp.src(source.vendor.iconfont) 
+		.pipe(gulp.dest(buide.iconfont)); 
+});
+
+gulp.task('vendor', function() {
+		gulp.src(source.vendor.font)
+		.pipe( gulp.dest(buide.vendor) )
+		;
+});
+
+gulp.task('styles', function() {
+	return gulp.src(source.styles.main)
+		.pipe(less({
+			paths: [source.styles.dir]
+		}))
+		.pipe(gulp.dest(buide.styles))
+		;
+});
+
+gulp.task('theme', function() {
+	return gulp.src(source.styles.theme)
+		.pipe(less({
+			paths: [source.styles.dir]
+		}))
+		.pipe(gulp.dest(buide.styles))
+		;
 });
 
 gulp.task('templates', function() {
-	gulp.src(config.templates.file)
+	gulp.src(source.templates.file)
 		.pipe(jade({
 			pretty: true
 		}))
-		.pipe(gulp.dest(config.dest.templates))
-});
-
-gulp.task('css', function() { 
-	return gulp.src(config.styles.main)
-		.pipe(less({
-			paths: [
-				source.lessPath,
-				source.bowerDir + '/bootstrap/less',
-				source.bowerDir + '/fontawesome/less'
-			]
-		}) 
-			.on("error", notify.onError(function (error) {
-				 return "Error: " + error.message;
-			}))) 
-		.pipe(gulp.dest(config.dest.styles))
-		.pipe(connect.reload()); 
+		.pipe(gulp.dest(buide.templates))
 });
 
 gulp.task('webserver', function() {
-	gulp.src(config.server)
+	gulp.src(buide.server)
 		.pipe(webserver({
 				host: 'localhost',
 				port: '5000',
@@ -81,19 +110,23 @@ gulp.task('webserver', function() {
 		}));
 });
 
+gulp.task('connectphp', function() {
+		connectphp.server();
+});
+
 // Rerun the task when a file changes
  gulp.task('watch', function() {
-	gulp.watch(config.styles.watch, ['css']); 
+	gulp.watch(config.styles.watch, ['styles', 'theme']); 
 	gulp.watch(config.templates.watch, ['templates']); 
 });
 
 var tasks = [
-	'bower',
 	'icons',
+	'vendor',
+	'theme',
+	'styles',
 	'templates',
-	'css',
-	'webserver',
-	'watch'
+	'connectphp'
 ];
 
 gulp.task('default', tasks);
