@@ -4,6 +4,12 @@ node_modules
 bower_components
 public
 
+### build
+fonts/**/*
+vendor/**/*
+css/**/*
+
+
 ### merge > Style-Guide-Boilerplate-Bootstrap form https://github.com/kemie/Style-Guide-Boilerplate-Bootstrap-Edition.git
 tests/unit/collapse.js
 *.codekit

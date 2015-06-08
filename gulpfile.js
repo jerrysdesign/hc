@@ -36,13 +36,12 @@ var source = {
 	vendor	: {
 		font:
 		[
-			config.vendor + '/open-sans-fontface/open-sans.css',
-			config.vendor + '/open-sans-fontface/fonts/Light/*',
-			config.vendor + '/open-sans-fontface/fonts/Regular/*',
-			config.vendor + '/open-sans-fontface/fonts/Italic/*',
-			config.vendor + '/open-sans-fontface/fonts/Semibold/*',
-			config.vendor + '/fontawesome/css/font-awesome.min.css',
-			config.vendor + '/fontawesome/fonts/*'
+			// config.vendor + '/open-sans-fontface/open-sans.css',
+			// config.vendor + '/open-sans-fontface/fonts/Light/*',
+			// config.vendor + '/open-sans-fontface/fonts/Regular/*',
+			// config.vendor + '/open-sans-fontface/fonts/Italic/*',
+			// config.vendor + '/open-sans-fontface/fonts/Semibold/*',
+			config.vendor + '/open-sans-fontface/**/*'// **所有目錄 // **/*所有目錄包含檔案
 		],
 		iconfont : [config.vendor + '/fontawesome/fonts/**.*']
 	}
@@ -54,7 +53,7 @@ var buide = {
 	styles		: './css',
 	templates	: '..',
 	iconfont	: './fonts',
-	font			: './fonts',
+	font			: './vendor/open-sans-fontface/',
 	derver		: '..'
 }
 
@@ -63,14 +62,15 @@ var buide = {
 // TASKS
 //---------------
 
-gulp.task('icons', function() { 
+gulp.task('iconfont', function() { 
 	return gulp.src(source.vendor.iconfont) 
-		.pipe(gulp.dest(buide.iconfont)); 
+		.pipe(gulp.dest(buide.iconfont))
+		; 
 });
 
-gulp.task('vendor', function() {
+gulp.task('font', function() {
 		gulp.src(source.vendor.font)
-		.pipe( gulp.dest(buide.vendor) )
+		.pipe(gulp.dest(buide.font))
 		;
 });
 
@@ -121,8 +121,8 @@ gulp.task('connectphp', function() {
 });
 
 var tasks = [
-	'icons',
-	'vendor',
+	'iconfont',
+	'font',
 	'theme',
 	'styles',
 	'templates',
